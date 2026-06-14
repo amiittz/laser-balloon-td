@@ -54,7 +54,7 @@ void loop() {
       // 2. קביעת מצב הלייזר
       if (laserState == 1) {
         // הפעלת הלייזר ב-50% עוצמה (127 מתוך מקסימום 255)
-        analogWrite(laserPin, 180);
+        analogWrite(laserPin, 3);
       } else {
         // כיבוי אקטיבי מוחלט (0V)
         analogWrite(laserPin, 0);

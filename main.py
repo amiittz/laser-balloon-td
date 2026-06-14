@@ -109,6 +109,13 @@ class LaserTrackerApp(QMainWindow):
         else:
             self.btn_tx.setText("Start Transmission (TX: OFF)")
             self.btn_tx.setStyleSheet("background-color: #f44336; color: white; font-weight: bold; font-size: 14px;")
+            # send a reset so the servos recenter and the laser turns off when we stop
+            if self.arduino:
+                try:
+                    self.arduino.write("X90Y90L0\n".encode('utf-8'))
+                    self.arduino.flush()
+                except Exception as e:
+                    print(f"Warning: failed to send reset command: {e}")
             print(">>> Serial Transmission STOPPED <<<")
 
     def toggle_calibration(self):
@@ -203,7 +210,7 @@ class LaserTrackerApp(QMainWindow):
                     error_y = cy - center_y
 
                     # turn that pixel error into a servo angle offset via the FOV
-                    offset_pan = -(error_x / w) * self.CAMERA_FOV_H
+                    offset_pan = (error_x / w) * self.CAMERA_FOV_H
                     offset_tilt = -(error_y / h) * self.CAMERA_FOV_V
 
                     raw_pan = self.SERVO_PAN_CENTER + offset_pan
@@ -269,6 +276,12 @@ class LaserTrackerApp(QMainWindow):
     def closeEvent(self, event):
         self.timer.stop()
         if self.arduino:
+            # always send one final reset command, regardless of TX state
+            try:
+                self.arduino.write("X90Y90L0\n".encode('utf-8'))
+                self.arduino.flush()
+            except Exception as e:
+                print(f"Warning: failed to send final reset command: {e}")
             self.arduino.close()
         self.cap.release()
         cv2.destroyAllWindows()
