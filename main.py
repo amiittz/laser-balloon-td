@@ -214,7 +214,8 @@ class LaserTrackerApp(QMainWindow):
                     offset_tilt = -(error_y / h) * self.CAMERA_FOV_V
 
                     raw_pan = self.SERVO_PAN_CENTER + offset_pan
-                    raw_tilt = self.SERVO_TILT_CENTER + offset_tilt
+                    # הוספת תיקון של 2.9 מעלות עבור מטר 
+                    raw_tilt = self.SERVO_TILT_CENTER + offset_tilt + 2.9
 
                     # servos only go 0-180, so clamp it
                     self.servo_pan = int(np.clip(raw_pan, 0, 180))
